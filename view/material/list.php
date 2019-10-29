@@ -2,13 +2,13 @@
 <?php 
 $fake_static = $root[strlen($root) - 1] !== '?';
 
-$file_link = function ($item, $dl=false) use ($root, $path, $fake_static) {
+$file_link = function ($item, $type='s') use ($root, $path, $fake_static) {
 	if (!empty($item['folder'])) {
 		$link = get_absolute_path($root.$path.rawurlencode($item['name']));
 	} else {
 		$link = get_absolute_path($root.$path).rawurlencode($item['name']);
-		if (!$dl) {
-			$link .= ($fake_static ? '?' : '&') . 's';
+		if ($type) {
+			$link .= ($fake_static ? '?' : '&') . $type;
 		}
 	}
 
@@ -52,7 +52,7 @@ function file_ico($item){
 		<li class="mdui-list-item mdui-ripple">
 			<a href="<?php echo get_absolute_path($root.$path.'../');?>">
 			  <div class="mdui-col-xs-12 mdui-col-sm-7">
-				<i class="mdui-icon material-icons">arrow_upward</i>
+				<i class="file-icon mdui-icon material-icons">arrow_upward</i>
 		    	..
 			  </div>
 			  <div class="mdui-col-sm-3 mdui-text-right"></div>
@@ -72,7 +72,7 @@ function file_ico($item){
 			data-link="<?php echo $file_link($item);?>"
 		>
 			<div class="mdui-col-xs-12 mdui-col-sm-7 mdui-text-truncate mdui-valign">
-				<i class="mdui-icon material-icons">folder_open</i>
+				<i class="file-icon mdui-icon material-icons">folder_open</i>
 				<a href="<?php echo $file_link($item);?>">
 		    	<?php e($item['name']);?>
 				</a>
@@ -89,11 +89,19 @@ function file_ico($item){
 			data-link="<?php echo $file_link($item);?>"
 		>
 			<div class="mdui-col-xs-12 mdui-col-sm-7 mdui-text-truncate mdui-valign">
-				<i class="mdui-icon material-icons"><?php echo file_ico($item);?></i>
+				<?php $ico_type = file_ico($item);
+					if ($ico_type === 'image'): ?>
+				<img class="thumb"
+					src="<?php echo $file_link($item, 't=32|32|1');?>"
+					srcset="<?php echo $file_link($item, 't=64|64|1');?> 2x"
+				>
+				<?php else: ?>
+				<i class="file-icon mdui-icon material-icons"><?php echo $ico_type;?></i>
+				<?php endif; ?>
 				<a href="<?php echo $file_link($item);?>">
 					<?php e($item['name']);?>
 				</a>
-				<a class="dl-link" href="<?php echo $file_link($item, true);?>">
+				<a class="dl-link" href="<?php echo $file_link($item, null);?>">
 					<i class="mdui-icon material-icons">link</i>
 				</a>
 			</div>

@@ -141,7 +141,6 @@
 			$request = self::request($path,"thumbnails/0?select={$size}");
 			$resp = fetch::get($request);
 			$data = json_decode($resp->content, true);
-			$request = self::request($path,"thumbnails/0?select={$size}");
 			return @$data[$size]['url'];
 		}
 

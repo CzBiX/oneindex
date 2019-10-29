@@ -67,6 +67,16 @@
 			margin-left: auto;
 		}
 
+		.thumb {
+			width: 32px;
+			margin-right: 8px;
+		}
+
+		.file-icon {
+			margin-left: 4px;
+			margin-right: 12px;
+		}
+
 		li:hover .dl-link {
 			visibility: visible;
 		}

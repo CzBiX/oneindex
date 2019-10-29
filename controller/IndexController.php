@@ -73,6 +73,10 @@ class IndexController{
 			$url = $_SERVER['REQUEST_URI'].'/';
 		}elseif(!is_null($_GET['t']) ){//缩略图
 			$url = $this->thumbnail($item);
+			if (!$url) {
+				http_response_code(404);
+				return;
+			}
 		}elseif($_SERVER['REQUEST_METHOD'] == 'POST' || !is_null($_GET['s']) ){
 			return $this->show($item);
 		}else{//返回下载链接
@@ -147,15 +151,20 @@ class IndexController{
 	//缩略图
 	function thumbnail($item){
 		if(!empty($_GET['t'])){
-			list($width, $height) = explode('|', $_GET['t']);
+			list($width, $height, $crop) = explode('|', $_GET['t']);
+			$crop = empty($crop) ? '' : '_Crop';
 		}else{
 			//800 176 96
 			$width = $height = 800;
+			$crop = '';
 		}
-		$item['thumb'] = onedrive::thumbnail($this->path.$this->name);
-		list($item['thumb'],$tmp) = explode('&width=', $item['thumb']);
-		$item['thumb'] .= strpos($item['thumb'], '?')?'&':'?';
-		return $item['thumb']."width={$width}&height={$height}";
+		$thumb = onedrive::thumbnail($this->path.$this->name, "c{$width}x{$height}{$crop}");
+		if (!$thumb) {
+			return null;
+		}
+		list($item['thumb']) = explode('?width=', $thumb);
+		$item['thumb'] .= '?';
+		return $thumb;
 	}
 
 	//文件夹下元素

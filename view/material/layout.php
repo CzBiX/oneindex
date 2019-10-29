@@ -61,6 +61,15 @@
 				display: block;
 			}
 		}
+
+		.dl-link {
+			visibility: hidden;
+			margin-left: auto;
+		}
+
+		li:hover .dl-link {
+			visibility: visible;
+		}
 	</style>
 </head>
 <body class="mdui-theme-primary-blue-grey mdui-theme-accent-blue">

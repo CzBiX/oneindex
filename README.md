@@ -21,8 +21,20 @@ Onedrive Directory Index
 ## 配置：
 <img width="658" alt="image" src="https://raw.githubusercontent.com/donwa/oneindex/files/images/install.gif">  
 
-### 计划任务  
-[可选]**推荐配置**，非必需。后台定时刷新缓存，可增加前台访问的速度。  
+### 伪静态配置 [可选]
+配置后可去掉 URL 中的 `/?/`
+
+#### Nginx
+增加一行指令
+
+`try_files $uri $uri/ /index.php?$query_string;`
+
+#### Apache
+启用 `AllowOverride`，或参考项目中的 `.htaccess` 文件进行配置
+
+
+### 计划任务 [可选]
+**推荐配置**，非必需。后台定时刷新缓存，可增加前台访问的速度。  
 ```
 # 每小时刷新一次token
 0 * * * * /具体路径/php /程序具体路径/one.php token:refresh

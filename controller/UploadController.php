@@ -98,7 +98,7 @@ class UploadController{
 	}
 
 	private function task_request($remotepath=''){
-		$request['headers'] = "Cookie: admin=".md5(config('password').config('refresh_token')).PHP_EOL;
+		$request['headers'] = "Cookie: admin=".sha1(config('password').config('refresh_token')).PHP_EOL;
 		$request['headers'] .= "Host: ".$_SERVER['HTTP_HOST'];
 		$request['curl_opt']=[CURLOPT_CONNECTTIMEOUT => 1,CURLOPT_TIMEOUT=>1,CURLOPT_FOLLOWLOCATION=>true];
 		$http_type = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';

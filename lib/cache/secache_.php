@@ -22,7 +22,7 @@ class secache_{
 	}
 
 	function get($key){
-		$this->c->fetch(md5($key),$data);
+		$this->c->fetch(sha1($key),$data);
 		if( is_array($data) && $data['expire'] > time() && !is_null($data['data']) ){
 			return $data['data'];
 		}else{
@@ -33,7 +33,7 @@ class secache_{
 	function set($key, $value=null, $expire=99999999){
 		$data['expire'] = time() + $expire;
 		$data['data'] = $value;
-		return $this->c->store(md5($key),$data);
+		return $this->c->store(sha1($key),$data);
 		
 	}
 

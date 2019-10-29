@@ -18,7 +18,7 @@ if( empty( config('refresh_token') ) ){
  *    系统后台
  */
 route::group(function(){
-	return ($_COOKIE['admin'] == md5(config('password').config('refresh_token')) );
+	return is_admin();
 },function(){
 	route::get('/logout','AdminController@logout');
 	route::any('/admin/','AdminController@settings');
@@ -48,7 +48,7 @@ define('VIEW_PATH', ROOT.'view/'.(config('style')?config('style'):'material').'/
  *    OneImg
  */
 $images = config('images@base');
-if( ($_COOKIE['admin'] == md5(config('password').config('refresh_token')) || $images['public']) ){
+if( is_admin() || $images['public'] ){
 	route::any('/images','ImagesController@index');
 	if($images['home']){
 		route::any('/','ImagesController@index');

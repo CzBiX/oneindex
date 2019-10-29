@@ -40,25 +40,24 @@ class IndexController{
 	function is_password(){
 		if(empty($this->items['.password'])){
 			return false;
-		}else{
+		}
+
 			$this->items['.password']['path'] = get_absolute_path($this->path).'.password';
- 		}
 		
 		$password = $this->get_content($this->items['.password']);
 		list($password) = explode("\n",$password);
 		$password = trim($password);
 		unset($this->items['.password']);
-		if(!empty($password) && strcmp($password, $_COOKIE[md5($this->path)]) === 0){
+		if(!empty($password) && strcmp($password, $_COOKIE[sha1($this->path)]) === 0){
 			return true;
 		}
 
 		$this->password($password);
-		
 	}
 
 	function password($password){
 		if(!empty($_POST['password']) && strcmp($password, $_POST['password']) === 0){
-			setcookie(md5($this->path), $_POST['password']);
+			setcookie(sha1($this->path), $_POST['password']);
 			return true;
 		}
 		$navs = $this->navs();

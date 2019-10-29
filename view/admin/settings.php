@@ -71,12 +71,18 @@
 			  <i class="mdui-switch-icon"></i>
 		  </label>
 		</div>
-		
 
-		
+		<div class="mdui-textfield">
+		  <h4>自动列出目录，启用后允许访客查看目录内容</h4>
+		  <label class="mdui-textfield-label"></label>
+		  <label class="mdui-switch">
+			  <input type="checkbox" name="auto_index" value="enable" <?php echo $config['auto_index'] ? 'checked' : '';?>/>
+			  <i class="mdui-switch-icon"></i>
+		  </label>
+		</div>
 
 	   <button type="submit" class="mdui-btn mdui-color-theme-accent mdui-ripple mdui-float-right">
-	   	<i class="mdui-icon material-icons">&#xe161;</i> 保存
+	   	<i class="mdui-icon material-icons">save</i> 保存
 	   </button>
 	</form>
 </div>

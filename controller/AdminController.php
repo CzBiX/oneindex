@@ -9,7 +9,8 @@ class AdminController{
 	  'cache_type'=>'secache',
 	  'cache_expire_time' => 3600,
 	  'cache_refresh_time' => 600,
-	  'root_path' => '?',
+		'root_path' => '?',
+		'auto_index' => false,
 	  'show'=> array (
 	  	'stream'=>['txt'],
 	    'image' => ['bmp','jpg','jpeg','png','gif'],
@@ -60,6 +61,7 @@ class AdminController{
 			config('cache_expire_time', intval($_POST['cache_expire_time']));
 			$_POST['root_path'] = empty($_POST['root_path'])?'?':'';
 			config('root_path', $_POST['root_path']);
+			config('auto_index', empty($_POST['auto_index'])?false:true);
 		}
 
 		$config = config('@base');

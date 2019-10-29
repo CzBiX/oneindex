@@ -23,7 +23,7 @@ class IndexController{
 		//是否404
 		$this->is404();
 
-		$this->is_password();
+		$has_password = $this->is_password();
 
 		header("Expires:-1");
 		header("Cache-Control:no_cache");
@@ -32,6 +32,11 @@ class IndexController{
 		if(!empty($this->name)){//file
 			return $this->file();
 		}else{//dir
+			if (!config('auto_index') && !$has_password && !is_admin()) {
+				http_response_code(403);
+				return;
+			}
+
 			return $this->dir();
 		}
 	}
@@ -42,7 +47,7 @@ class IndexController{
 			return false;
 		}
 
-			$this->items['.password']['path'] = get_absolute_path($this->path).'.password';
+		$this->items['.password']['path'] = get_absolute_path($this->path).'.password';
 		
 		$password = $this->get_content($this->items['.password']);
 		list($password) = explode("\n",$password);

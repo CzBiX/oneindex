@@ -6,6 +6,7 @@
 	<title><?php e($title.' - '.config('site_name'));?></title>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mdui@0.4.1/dist/css/mdui.min.css" integrity="sha256-lCFxSSYsY5OMx6y8gp8/j6NVngvBh3ulMtrf4SX5Z5A=" crossorigin="anonymous">
 	<script src="https://cdn.jsdelivr.net/npm/mdui@0.4.1/dist/js/mdui.min.js" integrity="sha256-dZxrLDxoyEQADIAGrWhPtWqjDFvZZBigzArprSzkKgI=" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js" integrity="sha256-chlNFSVx3TdcQ2Xlw7SvnbLAavAQLO0Y/LBiWX04viY=" crossorigin="anonymous"></script>
 	<style>
 		.mdui-appbar .mdui-toolbar{
 			height:56px;
@@ -62,6 +63,10 @@
 			}
 		}
 
+		[v-cloak] {
+			display: none;
+		}
+
 		.dl-link {
 			visibility: hidden;
 			margin-left: auto;
@@ -95,7 +100,7 @@
 	</header>
 	
 	<div class="mdui-container">
-    	<?php view::section('content');?>
-  	</div>
+		<?php view::section('content');?>
+	</div>
 </body>
 </html>

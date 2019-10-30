@@ -16,6 +16,10 @@ $file_link = function ($item, $type='s') use ($root, $path, $fake_static) {
 };
 
 function file_ico($item){
+	if ($item['folder']) {
+		return 'folder_open';
+	}
+
   $ext = strtolower(pathinfo($item['name'], PATHINFO_EXTENSION));
   if(in_array($ext,['bmp','jpg','jpeg','png','gif'])){
   	return "image";
@@ -42,11 +46,17 @@ function file_ico($item){
 
 	
 <div class="mdui-row">
-	<ul class="mdui-list" id="file-list">
+	<ul class="mdui-list" id="file-list" v-cloak>
 		<li class="mdui-list-item th">
-		  <div class="mdui-col-xs-12 mdui-col-sm-7">文件 <i class="mdui-icon material-icons icon-sort" data-sort="name" data-order="downward">expand_more</i></div>
-		  <div class="mdui-col-sm-3 mdui-text-right">修改时间 <i class="mdui-icon material-icons icon-sort" data-sort="date" data-order="downward">expand_more</i></div>
-		  <div class="mdui-col-sm-2 mdui-text-right">大小 <i class="mdui-icon material-icons icon-sort" data-sort="size" data-order="downward">expand_more</i></div>
+		  <div class="mdui-col-xs-12 mdui-col-sm-7" @click.prevent="sort('name')">
+				文件 <i v-if="sortType==='name'" class="mdui-icon material-icons">expand_{{ sortAsc ? 'less' : 'more'}}</i>
+			</div>
+		  <div class="mdui-col-sm-3 mdui-text-right" @click.prevent="sort('lastModifiedDateTime')">
+				修改时间 <i v-if="sortType==='lastModifiedDateTime'" class="mdui-icon material-icons">expand_{{ sortAsc ? 'less' : 'more'}}</i>
+			</div>
+		  <div class="mdui-col-sm-2 mdui-text-right" @click.prevent="sort('size')">
+				大小 <i v-if="sortType==='size'" class="mdui-icon material-icons">expand_{{ sortAsc ? 'less' : 'more'}}</i>
+			</div>
 		</li>
 		<?php if($path != '/'):?>
 		<li class="mdui-list-item mdui-ripple">
@@ -55,61 +65,28 @@ function file_ico($item){
 				<i class="file-icon mdui-icon material-icons">arrow_upward</i>
 		    	..
 			  </div>
-			  <div class="mdui-col-sm-3 mdui-text-right"></div>
-			  <div class="mdui-col-sm-2 mdui-text-right"></div>
-		  	</a>
+			</a>
 		</li>
 		<?php endif;?>
 
-		<?php foreach((array)$items as $item):?>
-			<?php if(!empty($item['folder'])):?>
-
-		<li class="mdui-list-item folder mdui-ripple"
-			data-sort
-			data-sort-name="<?php e($item['name']);?>"
-			data-sort-date="<?php echo $item['lastModifiedDateTime'];?>"
-			data-sort-size="<?php echo $item['size'];?>"
-			data-link="<?php echo $file_link($item);?>"
+		<li v-for="item in listToShow"
+			:key="item.name"
+			class="mdui-list-item mdui-ripple"
+			:class="item.folder ? 'folder' : 'file'"
+			@click.stop="view(item, $event)"
 		>
 			<div class="mdui-col-xs-12 mdui-col-sm-7 mdui-text-truncate mdui-valign">
-				<i class="file-icon mdui-icon material-icons">folder_open</i>
-				<a href="<?php echo $file_link($item);?>">
-		    	<?php e($item['name']);?>
+				<i class="file-icon mdui-icon material-icons">{{ item.iconType }}</i>
+				<a :href="item.viewLink">
+					{{ item.name }}
 				</a>
-			</div>
-			<div class="mdui-col-sm-3 mdui-text-right"><?php echo date("Y-m-d H:i:s", $item['lastModifiedDateTime']);?></div>
-			<div class="mdui-col-sm-2 mdui-text-right"><?php echo onedrive::human_filesize($item['size']);?></div>
-		</li>
-			<?php else:?>
-		<li class="mdui-list-item file mdui-ripple"
-			data-sort
-			data-sort-name="<?php e($item['name']);?>"
-			data-sort-date="<?php echo $item['lastModifiedDateTime'];?>"
-			data-sort-size="<?php echo $item['size'];?>"
-			data-link="<?php echo $file_link($item);?>"
-		>
-			<div class="mdui-col-xs-12 mdui-col-sm-7 mdui-text-truncate mdui-valign">
-				<?php $ico_type = file_ico($item);
-					if ($ico_type === 'image'): ?>
-				<img class="thumb"
-					src="<?php echo $file_link($item, 't=32|32|1');?>"
-					srcset="<?php echo $file_link($item, 't=64|64|1');?> 2x"
-				>
-				<?php else: ?>
-				<i class="file-icon mdui-icon material-icons"><?php echo $ico_type;?></i>
-				<?php endif; ?>
-				<a href="<?php echo $file_link($item);?>">
-					<?php e($item['name']);?>
-				</a>
-				<a class="dl-link" href="<?php echo $file_link($item, null);?>">
+				<a v-if="!item.folder" class="dl-link" :href="item.downloadLink">
 					<i class="mdui-icon material-icons">file_download</i>
 				</a>
 			</div>
-			<div class="mdui-col-sm-3 mdui-text-right"><?php echo date("Y-m-d H:i:s", $item['lastModifiedDateTime']);?></div>
-			<div class="mdui-col-sm-2 mdui-text-right"><?php echo onedrive::human_filesize($item['size']);?></div>
+			<div class="mdui-col-sm-3 mdui-text-right">{{ item.dateTimeStr }}</div>
+			<div class="mdui-col-sm-2 mdui-text-right">{{ item.fileSizeStr }}</div>
 		</li>
-			<?php endif;?>
-		<?php endforeach;?>
 	</ul>
 </div>
 <?php if($readme):?>
@@ -125,62 +102,79 @@ function file_ico($item){
 <script>
 $ = mdui.JQ;
 
-$.fn.extend({
-    sortElements: function (comparator, getSortable) {
-        getSortable = getSortable || function () { return this; };
-
-        var placements = this.map(function () {
-            var sortElement = getSortable.call(this),
-                parentNode = sortElement.parentNode,
-                nextSibling = parentNode.insertBefore(
-                    document.createTextNode(''),
-                    sortElement.nextSibling
-                );
-
-            return function () {
-                parentNode.insertBefore(this, nextSibling);
-                parentNode.removeChild(nextSibling);
-            };
-        });
-
-        return [].sort.call(this, comparator).each(function (i) {
-            placements[i].call(getSortable.call(this));
-        });
-    }
-});
-
-$(function () {
-	$('#file-list').on('click', 'li.file,li.folder', function (e) {
-		let el = e.target;
-		if ($(el).parent('a').length) {
-			return;
+new Vue({
+	el: '#file-list',
+	data() {
+		return {
+			list: [
+				<?php foreach($items as $item) {
+					unset($item['downloadUrl']);
+					$item['dateTimeStr'] = date("Y-m-d H:i:s", $item['lastModifiedDateTime']);
+					$item['fileSizeStr'] = onedrive::human_filesize($item['size']);
+					$item['iconType'] = file_ico($item);
+					$item['viewLink'] = $file_link($item);
+					$item['downloadLink'] = $file_link($item, null);
+					$item['thumbUrl'] = $file_link($item, 't');
+					echo json_encode($item);
+					echo ',';
+				} ?>
+			],
+			sortType: null,
+			sortAsc: true,
 		}
+	},
+	methods: {
+		view(item, e) {
+			let target = e.target;
+			while (target !== e.currentTarget) {
+				if (target.tagName === 'A') {
+					return;
+				}
 
-		if (el.tagName !== 'LI') {
-			el = $(el).parent('li').get(0);
+				target = target.parentElement;
+			}
+
+			const link = item.viewLink;
+			if (e.ctrlKey) {
+				window.open(link);
+			} else {
+				window.location = link;
+			}
+		},
+		sort(type) {
+			if (type !== this.sortType) {
+				this.sortType = type;
+				this.sortAsc = true;
+			} else if (this.sortAsc) {
+				this.sortAsc = false;
+			} else {
+				this.sortType = null;
+				this.listToShow = this.list;
+			}
 		}
+	},
+	computed: {
+		listToShow() {
+			const type = this.sortType;
+			if (!type) {
+				return this.list;
+			}
 
-		const link = el.dataset.link;
-		if (e.ctrlKey) {
-			window.open(link);
-		} else {
-			location = link;
+			const sortAsc = this.sortAsc;
+			const tmpArray = [...this.list];
+			tmpArray.sort((a, b) => {
+				let av = a[type], bv = b[type];
+				if (typeof av !== 'string') {
+					av = av.toString();
+					bv = bv.toString();
+				}
+				const v = av.localeCompare(bv, undefined, { numeric: true });
+				return sortAsc ? v : 0 - v;
+			});
+
+			return tmpArray;
 		}
-		return false;
-	});
-
-	$('.icon-sort').on('click', function () {
-		var sort_type = $(this).attr("data-sort"), sort_order = $(this).attr("data-order");
-		var sort_order_to = (sort_order === "less") ? "more" : "less";
-
-		$('li[data-sort]').sortElements(function (a, b) {
-			var data_a = $(a).attr("data-sort-" + sort_type), data_b = $(b).attr("data-sort-" + sort_type);
-			var rt = data_a.localeCompare(data_b, undefined, {numeric: true});
-			return (sort_order === "less") ? 0-rt : rt;
-		});
-
-		$(this).attr("data-order", sort_order_to).text("expand_" + sort_order_to);
-	})
-});
+	}
+})
 </script>
 <?php view::end('content');?>

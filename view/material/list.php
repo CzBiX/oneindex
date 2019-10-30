@@ -102,7 +102,7 @@ function file_ico($item){
 					<?php e($item['name']);?>
 				</a>
 				<a class="dl-link" href="<?php echo $file_link($item, null);?>">
-					<i class="mdui-icon material-icons">link</i>
+					<i class="mdui-icon material-icons">file_download</i>
 				</a>
 			</div>
 			<div class="mdui-col-sm-3 mdui-text-right"><?php echo date("Y-m-d H:i:s", $item['lastModifiedDateTime']);?></div>

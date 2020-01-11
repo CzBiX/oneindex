@@ -43,7 +43,7 @@ class IndexController{
 
 	//判断是否加密
 	function is_password(){
-		if(empty($this->items['.password'])){
+		if(empty($this->items['.password']) || is_admin()){
 			return false;
 		}
 

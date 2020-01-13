@@ -9,7 +9,7 @@
 		  <div class="mdui-textfield mdui-textfield-floating-label">
 		    <i class="mdui-icon material-icons">https</i>
 		    <label class="mdui-textfield-label">密码</label>
-		    <input name="password" class="mdui-textfield-input" type="password"/>
+		    <input name="password" class="mdui-textfield-input" type="password" autofocus />
 		  </div>
 		  <br>
 		  <button type="submit" class="mdui-center mdui-btn mdui-btn-raised mdui-ripple mdui-color-theme">

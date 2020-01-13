@@ -57,7 +57,7 @@ class IndexController{
 			return true;
 		}
 
-		$this->password($password);
+		return $this->password($password);
 	}
 
 	function password($password){
